@@ -18,22 +18,22 @@ export const authMiddleware = (
 
     if (!token) {
       res.status(401).json({ error: "No token provided" });
-      return; // Stop execution to ensure middleware returns `void`
+      return;
     }
 
-    jwt.verify(token, "1234", (err: any, decoded: any) => {
+    jwt.verify(token, process.env.JWT_TOKEN as string, (err: any, decoded: any) => {
       if (err) {
         res.status(401).json({ error: "Invalid or expired token" });
-        return; // Stop execution
+        return;
       }
 
-      req.user = { userId: decoded.userId }; // Attach user to the request
-      next(); // Pass control to the next middleware/route
+      req.user = { userId: decoded.userId };
+      next();
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
-    return; // Ensure the function stops here
+    return; 
   }
 };
 

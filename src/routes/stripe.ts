@@ -6,7 +6,7 @@ import { authMiddleware, AuthRequest } from "../middleware/middleware";
 
 const router = Router();
 
-const stripe = new Stripe("sk_test_51PnjcvAoWA18MplJmf1g9KfvvtsoTpCipRDbZGbhcmGSnEdn6wtJGAAHNMLvcSqiiqxtEXNxSfUg9XGRR3psICXl00cfscl8WS", { apiVersion: "2024-12-18.acacia" });
+const stripe = new Stripe(process.env.STRIPE_SECRET as string, { apiVersion: "2024-12-18.acacia" });
 
 const endpointSecret = "whsec_431ac61a9c1e19c32e3f41f8d3d06e25df6b367914707f01c72250d685009c5d";
 
