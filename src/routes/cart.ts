@@ -108,4 +108,26 @@ router.delete("/cartItem/:cartId", authMiddleware, async (req: AuthRequest, res:
     }
 });
 
+router.delete("/deleteCartItem/:id", authMiddleware, async (req: AuthRequest, res: Response) => {
+    const userId = req.user?.userId;
+    try {
+        const cart = await prisma.cart.findUnique({
+            where: {
+                userId: String(userId)
+            }
+        })
+        await prisma.cartItem.deleteMany({
+            where: {
+                cartId: cart!.id,
+                productId: String(req.params.id)
+            }
+        });
+        res.json("Deleted successfully!");
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
 export default router;

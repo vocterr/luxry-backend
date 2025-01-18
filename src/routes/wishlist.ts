@@ -49,6 +49,34 @@ router.post("/wishlistItem", authMiddleware, async (req: AuthRequest, res: Respo
         console.error(error);
         res.status(500).json({error: "Server error"});
     }
+});
+
+router.delete("/wishlistItem/:id", authMiddleware, async (req: AuthRequest, res: Response) => {
+    const userId = req.user?.userId;
+
+    try {
+        const wishlist = await prisma.wishlist.findUnique({
+            where: {
+                userId: String(userId)
+            }
+        })
+        const product = await prisma.product.findUnique({
+            where: {
+                id: String(req.params.id)
+            }
+        });
+        await prisma.wishlistItem.deleteMany({
+            where: {
+                productId: product!.id,
+                wishlistId: wishlist!.id
+            }
+        })
+        res.json("deleting successful!");
+    }
+    catch(error) {
+        console.error(error);
+        res.status(500).json({error: "Server error"});
+    }
 })
 
 export default router;
