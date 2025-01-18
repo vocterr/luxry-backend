@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es2016",                  // Fine as it ensures compatibility with ES2016.
+    "module": "commonjs",                // CommonJS is correct for Node.js (default module system).
+    "moduleResolution": "node",         // Resolves modules in a Node.js-like way.
+    "esModuleInterop": true,            // Enables interop for ES Modules with CommonJS.
+    "allowSyntheticDefaultImports": true, // Allows default imports for CommonJS modules.
+    "strict": true,                     // Enables strict type-checking options.
+    "outDir": "./dist",                 // Specifies the output directory for compiled files.
+    "rootDir": "./src",                 // Specifies the root directory of input files.
+    "resolveJsonModule": true,          // Allows importing JSON modules.
+    "skipLibCheck": true,               // Skips type checking of declaration files.
+    "forceConsistentCasingInFileNames": true // Ensures consistent file naming casing.
+  },
+  "include": ["src"],                   // Includes all files in the "src" folder.
+  "exclude": ["node_modules"]           // Excludes "node_modules" folder from compilation.
+}

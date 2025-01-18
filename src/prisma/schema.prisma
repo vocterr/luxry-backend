@@ -1,0 +1,182 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  String               @id @default(cuid())
+  name                String
+  email               String               @unique
+  password            String
+  role                UserRole             @default(USER)
+  resetPin            String                 @default("")
+  resetPinExpires     DateTime?  @default(now())
+  cart                Cart?
+  wishlist            Wishlist?
+  shippingInformation ShippingInformation?
+  orders              Order[]
+}
+
+model Product {
+  id               String      @id @default(cuid())
+  name             String      @db.VarChar(255)
+  description      String      @db.Text
+  price            Float // Luxury jewelry prices often require high precision
+  stock            Int         @default(0) // Number of pieces available in stock
+  material         Material    @relation(fields: [materialId], references: [id])
+  materialId       Int
+  gemstone         Gemstone?   @relation(fields: [gemstoneId], references: [id])
+  gemstoneId       Int?
+  weight           Float? // Jewelry weight in grams
+  carat            Float? // Carat weight of the gemstone (if applicable)
+  dimensions       String? // Dimensions of the piece (e.g., "3x4 cm")
+  style            String? // Jewelry style (e.g., "Vintage", "Modern", "Minimalist")
+  collection       Collection? @relation(fields: [collectionId], references: [id])
+  collectionId     Int?
+  image            Image? // Array of related images for the product
+  category         String // Category of jewelry (e.g., "Necklace", "Ring", "Bracelet")
+  certification    String? // Certification details (e.g., "GIA Certified")
+  occasion         String[] // Occasions this piece is suited for (e.g., ["Wedding", "Anniversary"])
+  careInstructions String? // Care instructions for the jewelry
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  // Additional fields
+  isFeatured    Boolean        @default(false) // To mark featured products for a carousel or promotion
+  rating        Float?
+  cartItems     CartItem[]
+  orderItems    OrderItem[]
+  wishlistItems WishlistItem[]
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String     @unique
+  cartItems CartItem[]
+  user      User       @relation(fields: [userId], references: [id])
+}
+
+model CartItem {
+  id        String  @id @default(cuid())
+  productId String
+  quantity  Int     @default(1)
+  cartId    String
+  cart      Cart    @relation(fields: [cartId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model ShippingInformation {
+  id          String  @id @default(cuid())
+  firstName   String  @default("")
+  lastName    String  @default("")
+  street      String  @default("")
+  city        String  @default("")
+  state       String  @default("")
+  zipCode     String  @default("")
+  country     String  @default("")
+  phoneNumber String  @default("")
+  userId      String  @unique
+  orders      Order[]
+  user        User    @relation(fields: [userId], references: [id])
+}
+
+model Order {
+  id                    String              @id @default(cuid())
+  userId                String
+  orderItems            OrderItem[]
+  totalAmount           Float
+  shippingInformationId String
+  paymentStatus         PaymentStatus
+  orderStatus           OrderStatus
+  user                  User                @relation(fields: [userId], references: [id])
+  shippingInformation   ShippingInformation @relation(fields: [shippingInformationId], references: [id])
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Int
+  order     Order   @relation(fields: [orderId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Wishlist {
+  id            String         @id @default(cuid())
+  userId        String         @unique
+  wishlistItems WishlistItem[]
+  user          User           @relation(fields: [userId], references: [id])
+}
+
+model WishlistItem {
+  id         String @id @default(cuid())
+  wishlistId String
+  productId  String
+
+  wishlist Wishlist @relation(fields: [wishlistId], references: [id])
+  product  Product  @relation(fields: [productId], references: [id])
+}
+
+model Material {
+  id       Int       @id @default(autoincrement())
+  name     String    @db.VarChar(100) // Material name (e.g., "Gold", "Silver")
+  purity   Float? // Purity percentage (e.g., 18k gold = 75%)
+  products Product[]
+}
+
+model Gemstone {
+  id       Int       @id @default(autoincrement())
+  type     String    @db.VarChar(100) // Type of gemstone (e.g., "Diamond", "Ruby", "Emerald")
+  color    String?   @db.VarChar(50) // Gemstone color (e.g., "Clear", "Red", "Green")
+  cut      String?   @db.VarChar(100) // Gemstone cut (e.g., "Round Brilliant", "Princess")
+  clarity  String?   @db.VarChar(50) // Clarity rating (e.g., "VS1", "SI2")
+  origin   String? // Origin of the gemstone (e.g., "South Africa", "Colombia")
+  products Product[]
+}
+
+model Collection {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(100) // Collection name (e.g., "Winter Elegance")
+  description String? // Description of the collection
+  products    Product[]
+  createdAt   DateTime  @default(now())
+}
+
+model Image {
+  id        String  @id @default(cuid())
+  url       String  @db.Text // URL of the image
+  altText   String? @db.VarChar(255) // Alternative text for accessibility
+  productId String  @unique
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELED
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
