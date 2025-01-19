@@ -66,9 +66,8 @@ router.post("/create-checkout-session", authMiddleware, async (req: AuthRequest,
 });
 
 
-router.post("/buy-now", authMiddleware, async (req: AuthRequest, res: Response): Promise<any> => {
+router.post("/buy-now", async (req: AuthRequest, res: Response): Promise<any> => {
     try {
-        const userId = req.user?.userId;
         const {productId} = req.body;
 
         const product = await prisma.product.findUnique({
@@ -100,7 +99,6 @@ router.post("/buy-now", authMiddleware, async (req: AuthRequest, res: Response):
             success_url: "https://luxry.vercel.app/success?session_id={CHECKOUT_SESSION_ID}",
             cancel_url: "https://luxry.vercel.app/cancel",
             metadata: {
-                userId: String(userId),
                 productId: product.id
             }
         });
