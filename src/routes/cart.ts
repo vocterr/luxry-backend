@@ -15,7 +15,11 @@ router.get("/cart", authMiddleware, async (req: AuthRequest, res: Response): Pro
             include: {
                 cartItems: {
                     include: {
-                        product: true
+                        product: {
+                            include: {
+                                image: true
+                            }
+                        }
                     }
                 }
             }
