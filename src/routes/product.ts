@@ -16,7 +16,10 @@ router.get("/carousel", async (req: Request, res: Response) => {
                     name: String(collectionName)
                 }
             },
-            take: 6
+            take: 6,
+            include: {
+                image: true
+            }
         });
         res.json(products);
     }
@@ -26,30 +29,16 @@ router.get("/carousel", async (req: Request, res: Response) => {
     }
 });
 
-router.get("/collection", async (req: Request, res: Response) => {
-    const {collectionName} =  req.query; 
-    try {
-        const products = await prisma.product.findMany({
-            where: {
-                collection: {
-                    name: String(collectionName)
-                }
-            },
-            take: 3
-        });
-        res.json(products);
-    }
-    catch(error) {
-        console.error(error);
-        res.status(500).json({error: "Server error"});
-    }
-});
+
 
 
 router.get("/products", async (req: Request, res: Response) => {
     try {
         const products = await prisma.product.findMany({
-            take: 20
+            take: 15,
+            include: {
+                image: true
+            }
         });
         res.json(products);
     }
