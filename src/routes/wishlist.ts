@@ -14,9 +14,13 @@ router.get("/wishlist", authMiddleware, async (req: AuthRequest, res: Response) 
             include: {
                 wishlistItems: {
                     include: {
-                        product: true
+                        product: {
+                            include: {
+                                image: true
+                            }
+                        }
                     }
-                }
+                },
             }
         });
         res.json(wishlist)

@@ -128,7 +128,10 @@ router.post("/create-product", authMiddleware, authorize, upload.single("image")
 router.get("/manageProducts", authMiddleware, authorize, async (req: AuthRequest, res: Response) => {
     try {
         const products = await prisma.product.findMany({
-            take: 15
+            take: 15,
+            include: {
+                image: true
+            }
         });
         res.json(products);
     }
@@ -155,7 +158,10 @@ router.get("/searchProducts", async (req: Request, res: Response) => {
                     { style: { contains: searchString } },
                   ]
                 }
-              : {}  // returns all products if search string is empty
+              : {} ,
+              include: {
+                image: true
+              } // returns all products if search string is empty
         });
         
         
@@ -177,6 +183,9 @@ router.get("/sortedProducts", async (req: Request, res: Response) => {
                     cartItems: {
                         _count: "desc"
                     }
+                },
+                include: {
+                    image: true
                 }
             });
         }
@@ -184,6 +193,9 @@ router.get("/sortedProducts", async (req: Request, res: Response) => {
             products = await prisma.product.findMany({
                 orderBy: {
                     price: "asc"
+                },
+                include: {
+                    image: true
                 }
             })
         } 
@@ -191,6 +203,9 @@ router.get("/sortedProducts", async (req: Request, res: Response) => {
             products = await prisma.product.findMany({
                 orderBy: {
                     price: "desc"
+                },
+                include: {
+                    image: true
                 }
             })
         }  
@@ -198,6 +213,9 @@ router.get("/sortedProducts", async (req: Request, res: Response) => {
             products = await prisma.product.findMany({
                 orderBy: {
                     updatedAt: "desc"
+                },
+                include: {
+                    image: true
                 }
             })
         }
@@ -205,6 +223,9 @@ router.get("/sortedProducts", async (req: Request, res: Response) => {
             products = await prisma.product.findMany({
                 orderBy: {
                     updatedAt: "asc"
+                },
+                include: {
+                    image: true
                 }
             })
         }
