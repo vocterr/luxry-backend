@@ -134,4 +134,44 @@ router.delete("/deleteCartItem/:id", authMiddleware, async (req: AuthRequest, re
     }
 });
 
+router.patch("/quantityplus/:id", authMiddleware, async (req: AuthRequest, res: Response) => {
+    try {
+        const cartItem = await prisma.cartItem.update({
+            where: {
+                id: String(req.params.id)
+            },
+            data: {
+                quantity: {
+                    increment: 1
+                }
+            }
+        });
+        res.json("Updated successfully!");
+    }
+    catch(error) {
+        console.error(error);
+        res.status(500).json({ error: "Server error" });
+    }
+})
+
+router.patch("/quantityminus/:id", authMiddleware, async (req: AuthRequest, res: Response) => {
+    try {
+        const cartItem = await prisma.cartItem.update({
+            where: {
+                id: String(req.params.id)
+            },
+            data: {
+                quantity: {
+                    decrement: 1
+                }
+            }
+        });
+        res.json("Updated successfully!");
+    }
+    catch(error) {
+        console.error(error);
+        res.status(500).json({ error: "Server error" });
+    }
+})
+
 export default router;
